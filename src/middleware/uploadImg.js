@@ -2,7 +2,6 @@ import multer from "multer";
 import { v2 as cloudinary } from "cloudinary";
 import { CloudinaryStorage } from "multer-storage-cloudinary";
 import { Shelter } from "../models/shelters.js";
-import { User } from "../models/user.js";
 
 
 export const uploadImage = (folderName) => {

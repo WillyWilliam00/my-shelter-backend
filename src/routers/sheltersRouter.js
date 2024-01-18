@@ -89,7 +89,7 @@ sheltersRouter
 
     .put("/myshelter", checkJwt,  async (req, res, next) => { // ok
       try {
-        checkIfIsAuthorized(req.user)
+        checkIfIsAuthorized(req.shelter)
         const shelterId = req.shelter.id
         const updateSchelter= await Shelter.findByIdAndUpdate(
         shelterId,
@@ -103,7 +103,7 @@ sheltersRouter
     }})
     .delete('/myshelter', checkJwt, async (req, res, next) => {
       try {
-        checkIfIsAuthorized(req.user)
+        checkIfIsAuthorized(req.shelter)
           const shelterId = req.shelter.id
           const deleteshelter = await Shelter.findByIdAndDelete(shelterId);
           res.status(!deleteshelter ? 404 : 204).send()
@@ -114,7 +114,7 @@ sheltersRouter
   })
   .patch("/myshelter/image", checkJwt, uploadImage("shelter-img"), async (req, res, next) => { //ok
     try {
-      checkIfIsAuthorized(req.user)
+      checkIfIsAuthorized(req.shelter)
       if (req.file) {
         res.status(200).json(await updateImage(Shelter, req.shelter.id, req.file.path))
       } else {

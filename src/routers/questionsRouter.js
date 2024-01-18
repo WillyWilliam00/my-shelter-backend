@@ -44,8 +44,10 @@ questionsRouter
 .patch("/update-answer/:id", checkJwt, async (req, res, next) => { //aggiunge/modifica la risposta della domanda 
     try {
         
-       
-        checkIfIsAuthorized(req.user)
+       // se checkIfIsAuthorized restituisce valore false l'utente non è autorizzato (si sta utilizzando un token tipo user o l'id non coincide)
+        if (!await checkIfIsAuthorized(req.shelter, req.shelter.id, req.params.id, Question)) {
+            return res.status(401).json({ message: "Non sei autorizzato!" });
+        }
         const { answer } = req.body;
         const updatedQuestion = await Question.findByIdAndUpdate(
                 req.params.id, 
@@ -67,7 +69,9 @@ questionsRouter
     
 .patch("/delete-answer/:id", checkJwt, async (req, res, next) => { // elimina la risposta e restituisce un campo vuoto 
     try {
-        checkIfIsAuthorized(req.user)
+        if (!await checkIfIsAuthorized(req.shelter, req.shelter.id, req.params.id, Question)) {
+            return res.status(401).json({ message: "Non sei autorizzato!" });
+        }
         const { id } = req.params;
         const updatedQuestion = await Question.findByIdAndUpdate(
             id, 
@@ -85,7 +89,11 @@ questionsRouter
 
 
 .patch("/update-question/:id", checkJwt, async (req, res, next) => { ///modifica la domanda  
-            try {
+            try { 
+                 
+                if (!await checkIfIsAuthorized(req.user, req.user.id, req.params.id, Question)) {
+                    return res.status(401).json({ message: "Non sei autorizzato!" });
+                }
                const { question } = req.body;
                const updatedQuestion = await Question.findByIdAndUpdate(
                         req.params.id, 
@@ -109,6 +117,9 @@ questionsRouter
       
 .delete("/:id", checkJwt, async (req, res, next) => { //elimina la domanda
     try {
+        if (!await checkIfIsAuthorized(req.user, req.user.id, req.params.id, Question)) {
+            return res.status(401).json({ message: "Non sei autorizzato!" });
+        }
       const deleteQuestion= await Question.findByIdAndDelete(req.params.id)
       res.status(!deleteQuestion ? 404 : 204).send()
     }catch (error) {

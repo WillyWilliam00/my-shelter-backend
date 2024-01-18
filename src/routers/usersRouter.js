@@ -53,7 +53,8 @@ usersRouter
       try {
         const { mail, password } = req.body
         const user = await User.findOne({ mail })
-        if (!user || !(await verifyPassword(password, user.password))) {
+         
+        if (!user || !await verifyPassword(password, user.password)) {
           return res.status(401).json({ message: "Invalid credentials" });
         }
         // Genera un nuovo token JWT
@@ -67,7 +68,7 @@ usersRouter
 
 .patch("/me/image", checkJwt, uploadImage("user-img"), async (req, res, next) => { //ok
     try {
-      checkIfIsAuthorized(req.shelter)
+      checkIfIsAuthorized(req.user)
           if (req.file) {
             res.status(200).json(await updateImage(User, req.user.id, req.file.path))
           } else {

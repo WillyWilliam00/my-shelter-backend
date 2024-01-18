@@ -3,7 +3,8 @@ import { User } from "../models/user.js"
 import { Shelter } from "../models/shelters.js"
 
 
-
+// controllo e definisco se il token deriva da un utente User o Shelter, in modo tale da verificare che le chiamate vengano effettuate 
+// solo se autorizzati (ad es la modifica di uun rifugio può essere fatta solo usando un token con payload.type shelter)
 export const checkJwt = async (req, res, next) => {
     try {
 
@@ -31,6 +32,7 @@ export const checkJwt = async (req, res, next) => {
     }
   }
 
+  // funzione per generare un token all'occorrenza
   export const generateToken = (id, type) => {
     return jwt.sign({ id, type }, process.env.JWT_SECRET, { expiresIn: "1h" });
 }

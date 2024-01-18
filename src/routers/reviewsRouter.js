@@ -24,8 +24,11 @@ reviewsRouter
       }})
 
 .post("/:shelterId", checkJwt, async (req, res, next) => {
+
   try{
-    checkIfIsAuthorized(req.shelter)
+    if (!await checkIfIsAuthorized(req.user)) {
+      return res.status(401).json({ message: "Non sei autorizzato!" });
+  }
             const createdBy = req.user.id
             const newReviewData = {...req.body, shelterId: req.params.shelterId, createdBy}
             const newReview = await Review.create(newReviewData)
@@ -44,11 +47,18 @@ reviewsRouter
   
 .put("/:id", checkJwt, async (req, res, next) => {
   try {
-    checkIfIsAuthorized(req.shelter)
+    if (!await checkIfIsAuthorized(req.user, req.user.id, req.params.id, Review)) {
+            return res.status(401).json({ message: "Non sei autorizzato!" });
+        }
     const updateReview= await Review.findByIdAndUpdate(
     req.params.id,
     req.body,
-    { new: true })
+    { new: true }).populate({
+        path: 'createdBy',
+        model: 'users', // Assicurati che sia il nome corretto del modello
+        select: 'name surname' // Specifica i campi da popolare
+        
+    });
     res.json(updateReview)
 
   }catch (error) {
@@ -57,7 +67,9 @@ reviewsRouter
 
 .delete("/:id", checkJwt, async (req, res, next) => {
   try {
-    checkIfIsAuthorized(req.shelter)
+    if (!await checkIfIsAuthorized(req.user, req.user.id, req.params.id, Review)) {
+      return res.status(401).json({ message: "Non sei autorizzato!" });
+  }
     const deleteReview= await Review.findByIdAndDelete(req.params.id)
     res.status(!deleteReview ? 404 : 204).send()
   }catch (error) {
