@@ -1,24 +1,23 @@
-import {mongoose, Schema } from "mongoose"
+import { mongoose, Schema } from "mongoose"
  
 
-const QuestionSchema = new Schema ({
+const QuestionSchema = new Schema({
 
     shelterId: {
     type: Schema.Types.ObjectId,
     ref: 'shelters',
-     
-    },
+         },
     createdBy: {
         type: Schema.Types.ObjectId,
         ref: 'users', // Riferimento al modello degli utenti (se necessario)
-         
-      },
+               },
     question: {
         type: String,
         required: true,
     },
     answer: {
-        type: String
+        type: String,
+        default: ""
     },
     date: {
         type: Date,

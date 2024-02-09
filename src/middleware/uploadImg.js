@@ -5,10 +5,8 @@ import { Shelter } from "../models/shelters.js";
 
 
 export const uploadImage = (folderName) => {
-   
-  return multer({
-    
-    storage: new CloudinaryStorage({
+     return multer({
+        storage: new CloudinaryStorage({
       cloudinary,
       params: {
         folder: `myshelter/${folderName}`,
@@ -17,10 +15,9 @@ export const uploadImage = (folderName) => {
   }).single(folderName);
 };
 
-
 export const updateImage = async (Model, id, filePath) => {
     try {
-      const updated = await Model.findByIdAndUpdate(id, { image: filePath }, { new: true }).select(Model===Shelter ? "-owner.password" : "-password");
+      const updated = await Model.findByIdAndUpdate(id, { image: filePath }, { new: true }).select(Model === Shelter ? "-owner.password" : "-password");
       return updated;
     } catch (error) {
       next(error)

@@ -1,25 +1,25 @@
 import express from "express"
 import { Shelter } from "../models/shelters.js"
-import {uploadImage, updateImage} from "../middleware/uploadImg.js" 
+import { uploadImage, updateImage } from "../middleware/uploadImg.js" 
 import bcrypt from "bcrypt"
 import { checkJwt, generateToken } from "../middleware/jwtUtilits.js";
 import { checkIfIsAuthorized } from "../Utilities.js/checkAuthorized.js"
-import { verifyPassword } from "../Utilities.js/verifyPassword.js";
+import { User } from "../models/user.js";
 const sheltersRouter = express.Router()
 
 
 
 sheltersRouter
 
-    .get("/", async (req,res,next) => { //ok
-    try{
+    .get("/", async (req, res, next) => { //ok
+    try {
         res.status(200).json(await Shelter.find({}).select("-owner.password"))
     } catch (err) {
         next(err)
     }
     })
 
-    .get("/myshelter", checkJwt, async (req, res, next) => { //ok
+    .get("/me", checkJwt, async (req, res, next) => { //ok
       try {
         const shelterId = req.shelter.id
         const myshelter = await Shelter.findById(shelterId).select("-owner.password")
@@ -46,11 +46,11 @@ sheltersRouter
       })
 
     .post("/", async (req, res, next) => { //ok
-      try{
-        const existingShelter = await Shelter.findOne({"owner.mail": req.body.owner.mail})
-        
-        if(existingShelter){
-          return res.status(400).json({message: "Questo rifugio esiste già!"})
+      try {
+        const existingShelter = await Shelter.findOne({ "owner.mail": req.body.owner.mail })
+        const existingUser = await User.findOne({ mail: req.body.owner.mail })
+        if (existingShelter || existingUser) {
+          return res.status(400).json({ message: "Questo rifugio esiste già!" })
         }
         const password = await bcrypt.hash(req.body.owner["password"], 10)
         const newShelter = await Shelter.create({
@@ -64,44 +64,33 @@ sheltersRouter
         const newShelterWithoutPsw = newShelter.toObject() 
         delete newShelterWithoutPsw.owner.password;
         res.status(201).json({ shelter: newShelterWithoutPsw, token });
-      }catch (err) {
-        next(err)
-      }
-    })
-
-    .post("/session", async (req, res, next) => { //ok
-      try {
-        const { mail, password } = req.body
-         
-        // trova il rifugio tramite email
-        const shelter = await Shelter.findOne({ "owner.mail": mail })
-        if (!shelter || !(await verifyPassword(password, shelter.owner.password))) {
-          return res.status(401).json({ message: "Invalid credentials" });
-        }
-        // Genera un nuovo token JWT
-        const token = generateToken(shelter.id, "shelter");
-        // Restituisce il rifugio con il nuovo token
-        res.status(200).json({ token })
-      } catch (err) {
+            } catch (err) {
         next(err)
       }
     })   
 
-    .put("/myshelter", checkJwt,  async (req, res, next) => { // ok
-      try {
-        checkIfIsAuthorized(req.shelter)
-        const shelterId = req.shelter.id
-        const updateSchelter= await Shelter.findByIdAndUpdate(
-        shelterId,
-        req.body,
-        { new: true }
-      ).select("-owner.password")
-      res.status(200).json(updateSchelter)
-      }catch (error) {
-      next(error)
+    
 
-    }})
-    .delete('/myshelter', checkJwt, async (req, res, next) => {
+  .put("/me", checkJwt, async (req, res, next) => {
+      try {
+        checkIfIsAuthorized(req.shelter);
+        const shelterId = req.shelter.id;
+        const updateObject = { ...req.body };
+      const existingShelter = await Shelter.findById(shelterId)
+      updateObject.owner.password = existingShelter.owner.password
+      // Aggiorna il rifugio nel database, escludendo la password dal processo di aggiornamento
+      const updatedShelter = await Shelter.findByIdAndUpdate(
+        shelterId,
+        updateObject,
+        { new: true }
+      ); // Esclude la password dal documento restituito
+      res.status(200).json(updatedShelter);
+    } catch (error) {
+      next(error);
+    }
+  })
+    
+  .delete('/me', checkJwt, async (req, res, next) => {
       try {
         checkIfIsAuthorized(req.shelter)
           const shelterId = req.shelter.id
@@ -112,7 +101,7 @@ sheltersRouter
       }
       
   })
-  .patch("/myshelter/image", checkJwt, uploadImage("shelter-img"), async (req, res, next) => { //ok
+  .patch("/me/image", checkJwt, uploadImage("shelter-img"), async (req, res, next) => { //ok
     try {
       checkIfIsAuthorized(req.shelter)
       if (req.file) {

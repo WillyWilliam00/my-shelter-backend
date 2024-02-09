@@ -35,8 +35,8 @@ reviewsRouter
             const populatedReview = await Review.findById(newReview._id)
             .populate({
                 path: 'createdBy',
-                model: 'users', // Assicurati che sia il nome corretto del modello
-                select: 'name surname' // Specifica i campi da popolare
+                model: 'users',  
+                select: 'name surname'  
                 
             });
      
@@ -55,8 +55,8 @@ reviewsRouter
     req.body,
     { new: true }).populate({
         path: 'createdBy',
-        model: 'users', // Assicurati che sia il nome corretto del modello
-        select: 'name surname' // Specifica i campi da popolare
+        model: 'users',  
+        select: 'name surname'  
         
     });
     res.json(updateReview)

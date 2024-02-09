@@ -1,16 +1,14 @@
-import {mongoose, Schema } from "mongoose"
+import { mongoose, Schema } from "mongoose"
 
-const UserSchema = new Schema ({
+const UserSchema = new Schema({
     name: {
         type: String,
         required: [true, "Il nome è obbligatorio"],
-        
-    },
+            },
     surname: {
         type: String,
         required: [true, "Il cognome è obbligatorio"],
-        
-    },
+            },
     mail: {
         type: String,
         required: [true, "La mail è obbligatoria"],
@@ -23,11 +21,30 @@ const UserSchema = new Schema ({
     image: {
         type: String
     },
-    nationality: {
-        type: String
-    }
-    // verificare se serve coordinate x mappa google
-
+    address: {
+        type: String,
+        required: true
+    },
+    houseNumber: {
+        type: Number,
+        required: true
+    },
+    zipCode: {
+        type: Number,
+        required: true
+    },
+    province: {
+        type: String,
+        required: true
+    },
+    country: {
+        type: String,
+        required: true
+    },
+    favoriteShelters: [{
+        type: Schema.Types.ObjectId,
+        ref: 'shelters'
+    }]
 })
 
 export const User = mongoose.model("users", UserSchema);

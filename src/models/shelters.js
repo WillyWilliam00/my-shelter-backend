@@ -1,4 +1,4 @@
-import {mongoose, Schema } from "mongoose"
+import { mongoose, Schema } from "mongoose"
 
 
 const ShelterSchema = new Schema({
@@ -13,24 +13,47 @@ const ShelterSchema = new Schema({
         min: [0, "L'altitudine deve essere un numero positivo o zero"],
     },
     description: {
-        type: String
+        type: String,
+        required: true
     },
     image: {
         type: String,
-        required: [true, "La foto di sfondo è obbligatoria"],
+        default: "https://images.pexels.com/photos/18447681/pexels-photo-18447681/free-photo-of-paesaggio-montagne-case-casa.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
+    },
+    coordinates: {
+        lat: {
+            type: Number,
+            required: true
+        },
+        lng: {
+            type: Number,
+            required: true
+        }
     },
     availableServices: {
         accommodation: {
-            type: { type: Boolean, default: false, required: true }
+            type: Boolean, default: false
         },
         toilets: {
-            type: { type: Boolean, default: false, required: true }
+            type: Boolean, default: false
         },
         accessibility: {
-            type: { type: Boolean, default: false, required: true }
+            type: Boolean, default: false
         },
-        dogsAllowed: {
-            type: { type: Boolean, default: false, required: true }
+        animalsAllowed: {
+            type: Boolean, default: false
+        },
+        wifi: {
+            type: Boolean, default: false
+        },
+        guidedTours: {
+            type: Boolean, default: false
+        },
+        picnicArea: {
+            type: Boolean, default: false
+        },
+        parking: {
+            type: Boolean, default: false
         }
     },    
     owner: {
@@ -39,7 +62,7 @@ const ShelterSchema = new Schema({
         password: { type: String, required: true },
         mail: {
             type: String,
-            required: [true, "L'indirizzo email è obbligatorio"]
+            required: [true, "L'indirizzo email è obbligatorio"],
         },
         phone: {
             type: String,

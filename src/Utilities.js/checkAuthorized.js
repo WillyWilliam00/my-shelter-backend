@@ -7,14 +7,14 @@
 export const checkIfIsAuthorized = async (reqType, userId, questionOrReviewId, Model) => {
   if (!reqType) {              
       return false;
-  } else if (questionOrReviewId) {
-      const question = await Model.findById(questionOrReviewId);
-      return question && question.createdBy.toString() === userId;
+  } else if (questionOrReviewId && reqType === "user") {
+      const questionOrReview = await Model.findById(questionOrReviewId);
+      return questionOrReview && questionOrReview.createdBy.toString() === userId;
   }
   return true;
 };
 
 
-  //check se l'id proveniente dal check jwt sia lo stesso dell'id dell'utente della domanda che si vuole modificare
+  //check se l'id proveniente dal check jwt sia lo stesso dell'id dell'utente della domanda che si vuole modificare (un utene puo modificare solo una sua domanda/recensione)
 
-  // serve ID utente dal jwt e id utente dalla domanda 
+   

@@ -6,10 +6,10 @@ const questionsRouter = express.Router()
 
 questionsRouter
 
-.get("/:shelterId", checkJwt, async (req,res,next) => { //restituisce tutte le domande di un rifugio particolare
+.get("/:shelterId", checkJwt, async (req, res, next) => { //restituisce tutte le domande di un rifugio particolare
     try {
-        const {shelterId} = req.params
-        const questions = await Question.find({shelterId: shelterId})
+        const { shelterId } = req.params
+        const questions = await Question.find({ shelterId: shelterId })
         .populate({
             path: 'createdBy',
             model: 'users', // Assicurati che sia il nome corretto del modello
@@ -20,13 +20,13 @@ questionsRouter
         res.status(200).json(questions);
     } catch (err) {
         next(err)
-    }})
+    }
+    })
 
 .post("/:shelterId", checkJwt, async (req, res, next) => { //crea una domanda per un rifugio particolare
-
-    try{
+try {
             const createdBy = req.user.id
-            const newQuestionData = {...req.body, shelterId: req.params.shelterId, createdBy}
+            const newQuestionData = { ...req.body, shelterId: req.params.shelterId, createdBy }
             const newQuestion = await Question.create(newQuestionData)
             const populatedQuestion = await Question.findById(newQuestion._id)
             .populate({
@@ -35,16 +35,15 @@ questionsRouter
                 select: 'name surname' // Specifica i campi da popolare
                 
             });
-
             res.json(populatedQuestion);
-    }catch (err) {
+    } catch (err) {
       next(err)
-    }})
+    }
+    })
     
 .patch("/update-answer/:id", checkJwt, async (req, res, next) => { //aggiunge/modifica la risposta della domanda 
     try {
-        
-       // se checkIfIsAuthorized restituisce valore false l'utente non è autorizzato (si sta utilizzando un token tipo user o l'id non coincide)
+               // se checkIfIsAuthorized restituisce valore false l'utente non è autorizzato (si sta utilizzando un token tipo user o l'id non coincide)
         if (!await checkIfIsAuthorized(req.shelter, req.shelter.id, req.params.id, Question)) {
             return res.status(401).json({ message: "Non sei autorizzato!" });
         }
@@ -90,10 +89,8 @@ questionsRouter
 
 .patch("/update-question/:id", checkJwt, async (req, res, next) => { ///modifica la domanda  
             try { 
-                 
-                if (!await checkIfIsAuthorized(req.user, req.user.id, req.params.id, Question)) {
-                    return res.status(401).json({ message: "Non sei autorizzato!" });
-                }
+                                 if (!await checkIfIsAuthorized(req.user, req.user.id, req.params.id, Question)) {
+                    return res.status(401).json({ message: "Non sei autorizzato!" })}
                const { question } = req.body;
                const updatedQuestion = await Question.findByIdAndUpdate(
                         req.params.id, 
@@ -103,11 +100,9 @@ questionsRouter
                         path: 'createdBy',
                         model: 'users', // Assicurati che sia il nome corretto del modello
                         select: 'name surname' // Specifica i campi da popolare
-                        
-                    });
+                                            });
                     if (!updatedQuestion) {
-                        return res.status(404).send("Domanda non trovata");
-                    }
+                        return res.status(404).send("Domanda non trovata");}
                     res.status(200).json(updatedQuestion);
                 } catch (error) {
                     next(error);
@@ -118,13 +113,13 @@ questionsRouter
 .delete("/:id", checkJwt, async (req, res, next) => { //elimina la domanda
     try {
         if (!await checkIfIsAuthorized(req.user, req.user.id, req.params.id, Question)) {
-            return res.status(401).json({ message: "Non sei autorizzato!" });
-        }
-      const deleteQuestion= await Question.findByIdAndDelete(req.params.id)
+            return res.status(401).json({ message: "Non sei autorizzato!" });}
+      const deleteQuestion = await Question.findByIdAndDelete(req.params.id)
       res.status(!deleteQuestion ? 404 : 204).send()
-    }catch (error) {
+    } catch (error) {
       next(error)
-    }})
+    }
+    })
       
 
 export default questionsRouter
