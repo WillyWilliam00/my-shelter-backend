@@ -16,7 +16,7 @@ import { Shelter } from "./models/shelters.js";
 const server = express()
 
 
-const whitelist = ["", "http://localhost:3000"]
+const whitelist = ["https://myshelterapp.netlify.app", "http://localhost:3000" ]
 const corsOptions = {
   origin: function (origin, next) {
     if (whitelist.indexOf(origin) !== -1 || !origin) {
